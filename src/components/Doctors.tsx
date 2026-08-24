@@ -6,7 +6,6 @@ import { GraduationCap } from "lucide-react";
 
 const doctors = [
   {
-    name: "ทพญ. วธู  เมตตาสิทธิการ",
     specialty: "ทันตกรรมทั่วไปและจัดฟัน",
     edu: "ทันตแพทยศาสตรบัณฑิต",
   },
@@ -68,8 +67,12 @@ export default function Doctors() {
               </div>
 
               <div className="p-6">
-                <h3 className="text-xl font-bold text-w2-gray-900">{doctor.name}</h3>
-                <p className="mt-2 text-w2-gray-500">{doctor.specialty}</p>
+                {"name" in doctor && (
+                  <h3 className="text-xl font-bold text-w2-gray-900">{doctor.name}</h3>
+                )}
+                <p className={`${"name" in doctor ? "mt-2" : ""} text-w2-gray-500`}>
+                  {doctor.specialty}
+                </p>
                 <div className="mt-4 flex items-center gap-2 text-sm text-w2-gray-400">
                   <GraduationCap size={16} />
                   <span>{doctor.edu}</span>
