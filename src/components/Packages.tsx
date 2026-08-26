@@ -46,9 +46,6 @@ export default function Packages() {
         >
           <span className="section-kicker">Packages</span>
           <h2 className="mt-3 text-4xl font-bold text-w2-gray-900">แพ็คเกจแนะนำ</h2>
-          <p className="mt-4 leading-8 text-w2-gray-500">
-            จัดแพ็คเกจให้เปรียบเทียบง่ายขึ้น พร้อมปุ่มนัดหมายตรงถึงฟอร์ม
-          </p>
         </div>
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
