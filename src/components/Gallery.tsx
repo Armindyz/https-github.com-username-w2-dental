@@ -25,7 +25,7 @@ export default function Gallery() {
         <div className="mx-auto max-w-7xl">
           <div
             ref={titleRef}
-            className="mb-12 grid gap-6 lg:grid-cols-[0.8fr_1fr] lg:items-end"
+            className="mb-12"
             style={{
               opacity: inView ? 1 : 0,
               transform: inView ? "translateY(0)" : "translateY(20px)",
@@ -38,9 +38,6 @@ export default function Gallery() {
                 แกลเลอรี่บรรยากาศคลินิก
               </h2>
             </div>
-            <p className="max-w-2xl leading-8 text-w2-gray-500">
-              ใช้รูปจริงเป็นจุดเด่นของหน้าเว็บ ช่วยให้ผู้ป่วยเห็นความสะอาด ความสว่าง และความเป็นมืออาชีพก่อนเข้ารับบริการ
-            </p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
