@@ -210,3 +210,32 @@ button, input, select, textarea {
   background: linear-gradient(90deg, #D4A843, #F0C855, #EDD579);
   box-shadow: 0 4px 16px rgba(212, 168, 67, 0.45);
 }
+
+/* Compact promotion cards and responsive, manually controlled carousel. */
+.package-section { background: #f8faff; }
+.package-panel { box-shadow: 0 4px 28px rgba(49, 91, 151, 0.06); }
+.package-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding: 12px 4px 20px;
+  margin: -12px -4px -20px;
+}
+.package-track::-webkit-scrollbar { display: none; }
+.package-card {
+  scroll-snap-align: start;
+  box-shadow: 0 5px 22px rgba(49, 109, 190, 0.10);
+}
+.package-track-all { grid-auto-flow: row; grid-template-columns: minmax(0, 1fr); overflow: visible; }
+@media (min-width: 640px) {
+  .package-track { grid-auto-columns: calc((100% - 24px) / 2); }
+  .package-track-all { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .package-track { grid-auto-columns: calc((100% - 48px) / 3); }
+  .package-track-all { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

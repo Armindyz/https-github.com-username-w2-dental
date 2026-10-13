@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { clinicLocation } from "@/lib/clinic-location";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -61,8 +62,7 @@ export default function Footer() {
           <div>
             <p className="mb-4 text-sm font-bold text-w2-gray-900">เวลาทำการ</p>
             <div className="grid gap-2 text-sm">
-              <p>จันทร์ - เสาร์: 09:00 - 18:00</p>
-              <p>อาทิตย์: 10:00 - 16:00</p>
+              <p>เปิดทุกวัน 10.00–20.00 น.</p>
               <div className="mt-4 border-t border-w2-gray-200 pt-4">
                 <a href="tel:0628292228" className="block transition hover:text-w2-gray-900">
                   062-829-2228
@@ -70,6 +70,10 @@ export default function Footer() {
                 <a href="mailto:W2dentalclinic@gmail.com" className="mt-1 block transition hover:text-w2-gray-900">
                   W2dentalclinic@gmail.com
                 </a>
+                <a href={clinicLocation.mapsUrl} target="_blank" rel="noopener noreferrer" className="mt-3 block underline underline-offset-4 transition hover:text-w2-gray-900">
+                  แผนที่ / นำทางมาคลินิก
+                </a>
+                <p className="mt-1 leading-6">{clinicLocation.area}</p>
               </div>
             </div>
           </div>

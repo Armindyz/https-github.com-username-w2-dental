@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { CalendarCheck, Menu, Phone, X } from "lucide-react";
+import { CalendarCheck, Menu, Phone } from "lucide-react";
 
 const navLinks = [
   { label: "หน้าแรก", href: "#home" },
   { label: "บริการ", href: "#services" },
   { label: "แกลเลอรี่", href: "#gallery" },
   { label: "ทีมแพทย์", href: "#doctors" },
-  { label: "แพ็คเกจ", href: "#packages" },
+  { label: "โปรจัดฟัน", href: "#packages" },
   { label: "ติดต่อ", href: "#contact" },
 ];
 
@@ -154,43 +154,46 @@ export default function Navbar() {
             <button
               onClick={() => setMenuOpen((value) => !value)}
               className="rounded-lg border border-w2-gray-100 p-2 text-w2-gray-700 transition hover:bg-w2-gray-50 2xl:hidden"
-              aria-label="เปิดเมนู"
+              aria-label={menuOpen ? "ปิดเมนู" : "เปิดเมนู"}
+              aria-expanded={menuOpen}
             >
-              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+              <Menu size={22} />
             </button>
           </div>
         </div>
       </header>
 
       <div
-        className={`fixed inset-0 z-40 bg-white transition 2xl:hidden ${
+        className={`fixed inset-x-0 top-16 z-40 transition sm:top-[72px] lg:top-20 2xl:hidden ${
           menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
-        <nav className="flex flex-col gap-2 px-5 pb-8 pt-24 sm:px-6 sm:pt-28">
-          {navLinks.map((link) => (
+        <div className="mx-auto max-w-7xl px-3 sm:px-5 lg:px-6 xl:px-8">
+          <nav className="grid grid-cols-2 gap-1 rounded-b-xl border border-t-0 border-w2-gray-100 bg-white/96 p-2 shadow-xl shadow-w2-gray-200/60 backdrop-blur-xl sm:grid-cols-3 lg:flex lg:flex-wrap lg:items-center lg:justify-end">
+            {navLinks.map((link) => (
+              <button
+                key={link.href}
+                onClick={() => handleNavClick(link.href)}
+                className="rounded-lg px-3 py-2 text-center text-sm font-semibold text-w2-gray-700 transition hover:bg-w2-gray-50 hover:text-w2-gray-900 lg:px-3.5"
+              >
+                {link.label}
+              </button>
+            ))}
             <button
-              key={link.href}
-              onClick={() => handleNavClick(link.href)}
-              className="border-b border-w2-gray-100 py-4 text-left text-2xl font-semibold text-w2-gray-900"
+              onClick={() => handleNavClick("#register")}
+              className="champagne-cta rounded-lg px-3 py-2 text-sm font-bold sm:col-span-1"
             >
-              {link.label}
+              นัดหมายออนไลน์
             </button>
-          ))}
-          <button
-            onClick={() => handleNavClick("#register")}
-            className="champagne-cta mt-6 rounded-lg px-5 py-4 text-base font-bold"
-          >
-            นัดหมายออนไลน์
-          </button>
-          <a
-            href="tel:0628292228"
-            className="flex justify-center gap-2 rounded-lg border border-w2-gray-100 px-5 py-4 font-semibold text-w2-gray-700"
-          >
-            <Phone size={18} />
-            {phone}
-          </a>
-        </nav>
+            <a
+              href="tel:0628292228"
+              className="flex items-center justify-center gap-2 rounded-lg border border-w2-gray-100 px-3 py-2 text-sm font-semibold text-w2-gray-700 transition hover:bg-w2-gray-50 sm:col-span-1"
+            >
+              <Phone size={16} />
+              {phone}
+            </a>
+          </nav>
+        </div>
       </div>
     </>
   );

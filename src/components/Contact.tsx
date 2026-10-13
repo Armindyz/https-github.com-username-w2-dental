@@ -3,7 +3,8 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { useInView } from "framer-motion";
-import { Mail, MapPin, Phone, Timer } from "lucide-react";
+import { Mail, MapPin, Navigation, Phone, Timer } from "lucide-react";
+import { clinicLocation } from "@/lib/clinic-location";
 
 export default function Contact() {
   const ref = useRef(null);
@@ -13,7 +14,8 @@ export default function Contact() {
     {
       icon: MapPin,
       title: "ที่อยู่",
-      lines: ["กรุณาใส่ที่อยู่คลินิกจริง", "เพิ่มลิงก์ Google Maps ได้ในส่วนนี้"],
+      lines: ["W2 Dental Clinic", clinicLocation.area],
+      href: clinicLocation.mapsUrl,
     },
     {
       icon: Phone,
@@ -24,7 +26,7 @@ export default function Contact() {
     {
       icon: Timer,
       title: "เวลาทำการ",
-      lines: ["จันทร์ - เสาร์: 09:00 - 18:00", "อาทิตย์: 10:00 - 16:00"],
+      lines: ["เปิดทุกวัน 10.00–20.00 น."],
     },
     {
       icon: Mail,
@@ -49,7 +51,7 @@ export default function Contact() {
           <span className="section-kicker">Contact</span>
           <h2 className="mt-3 text-4xl font-bold text-w2-gray-900">ติดต่อเรา</h2>
           <p className="mt-4 leading-8 text-w2-gray-500">
-            รวมข้อมูลติดต่อให้สแกนง่าย พร้อมภาพหน้าคลินิกเพื่อช่วยให้ผู้ป่วยจำสถานที่ได้
+            พบกันที่ W2 Dental Clinic แยกตาปาน สุราษฎร์ธานี เปิดแผนที่เพื่อวางแผนการเดินทางมาคลินิก
           </p>
         </div>
 
@@ -74,7 +76,7 @@ export default function Contact() {
                     <p className="text-sm font-bold text-w2-gray-900">{item.title}</p>
                     {item.lines.map((line, lineIndex) =>
                       item.href && lineIndex === 0 ? (
-                        <a key={line} href={item.href} className="mt-1 block text-w2-gray-500 hover:text-w2-gray-900">
+                        <a key={line} href={item.href} target={item.href.startsWith("https://") ? "_blank" : undefined} rel={item.href.startsWith("https://") ? "noopener noreferrer" : undefined} className="mt-1 block text-w2-gray-500 hover:text-w2-gray-900">
                           {line}
                         </a>
                       ) : (
@@ -108,12 +110,25 @@ export default function Contact() {
                 W2 Dental Clinic
               </div>
             </div>
-            <div className="silver-card grid min-h-48 place-items-center rounded-lg p-8 text-center">
-              <div>
-                <p className="font-bold text-w2-gray-900">Google Maps</p>
-                <p className="mt-2 text-sm leading-6 text-w2-gray-500">
-                  ใส่ iframe Google Maps จริงในกล่องนี้เมื่อมีพิกัดคลินิกพร้อมใช้งาน
-                </p>
+            <div className="overflow-hidden rounded-lg border border-w2-gray-200 bg-white soft-shadow">
+              <iframe
+                src={clinicLocation.embedUrl}
+                title="แผนที่ W2 Dental Clinic แยกตาปาน สุราษฎร์ธานี"
+                width="600"
+                height="360"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+                className="h-72 w-full border-0 sm:h-90"
+              />
+              <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-bold text-w2-gray-900">W2 Dental Clinic</p>
+                  <p className="mt-1 text-sm leading-6 text-w2-gray-500">{clinicLocation.area}</p>
+                </div>
+                <a href={clinicLocation.mapsUrl} target="_blank" rel="noopener noreferrer" aria-label="เปิด Google Maps เพื่อนำทางไป W2 Dental Clinic (แท็บใหม่)" className="champagne-cta inline-flex shrink-0 items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-4">
+                  <Navigation size={18} aria-hidden="true" />เปิดแผนที่ / นำทาง
+                </a>
               </div>
             </div>
           </div>
