@@ -5,7 +5,6 @@ import Gallery from '@/components/Gallery';
 import WhyUs from '@/components/WhyUs';
 import Doctors from '@/components/Doctors';
 import Packages from '@/components/Packages';
-import ClinicVideo from '@/components/ClinicVideo';
 import AppointmentForm from '@/components/AppointmentForm';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
@@ -19,7 +18,6 @@ export default function Home() {
         <Hero />
         <Services />
         <Packages />
-        <ClinicVideo />
         <Gallery />
         <WhyUs />
         <Doctors />

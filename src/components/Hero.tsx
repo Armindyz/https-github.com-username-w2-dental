@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { CalendarCheck, ChevronLeft, ChevronRight, ShieldCheck } from "lucide-react";
+import ClinicVideo from "./ClinicVideo";
+import { CalendarCheck, ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
   {
@@ -65,7 +66,7 @@ export default function Hero() {
       <div className="absolute inset-0 hero-vignette" />
 
       <div className="relative z-10 mx-auto flex min-h-[92vh] max-w-7xl items-center px-5 pb-14 pt-28 lg:px-8">
-        <div className="grid w-full gap-10 lg:grid-cols-[1fr_0.72fr] lg:items-end">
+        <div className="grid w-full gap-10 lg:grid-cols-[1fr_0.72fr] lg:items-center">
           <div className="max-w-3xl">
             <div
               className="hero-logo-panel mb-6 w-full max-w-md overflow-hidden rounded-2xl backdrop-blur-sm"
@@ -108,40 +109,7 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className="silver-card hidden rounded-lg p-5 text-w2-gray-700 backdrop-blur-md lg:block">
-            <div className="logo-silver-panel mb-5 rounded-lg p-5">
-              <Image
-                src="/brand/w2-logo-icon.png"
-                alt="W2 Dental Clinic logo mark"
-                width={300}
-                height={245}
-                className="logo-on-silver mx-auto h-auto w-44 max-w-full object-contain"
-              />
-            </div>
-            <div className="flex items-start gap-3">
-              <ShieldCheck className="mt-1 text-w2-gray-500" size={22} />
-              <div>
-                <p className="font-bold">มาตรฐานที่ไว้ใจได้</p>
-                <p className="mt-2 text-sm leading-6 text-w2-gray-500">
-                  แจ้งขั้นตอนและค่าใช้จ่ายก่อนเริ่มรักษา พร้อมระบบฆ่าเชื้อและพื้นที่รับรองที่ดูสะอาดสบายตา
-                </p>
-              </div>
-            </div>
-            <div className="mt-5 grid grid-cols-3 gap-3 border-t border-w2-gray-200 pt-5 text-center">
-              <div>
-                <p className="text-2xl font-bold">6+</p>
-                <p className="mt-1 text-xs text-white/60">กลุ่มบริการ</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold">24 ชม.</p>
-                <p className="mt-1 text-xs text-white/60">ติดต่อกลับ</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold">W2</p>
-                <p className="mt-1 text-xs text-white/60">Smile Better</p>
-              </div>
-            </div>
-          </div>
+          <ClinicVideo />
         </div>
       </div>
 
