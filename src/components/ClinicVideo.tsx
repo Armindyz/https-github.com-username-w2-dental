@@ -1,15 +1,23 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Play } from "lucide-react";
+import { Pause, Play } from "lucide-react";
 
 export default function ClinicVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const playVideo = async () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (!video.paused) {
+      video.pause();
+      return;
+    }
     try {
-      await videoRef.current?.play();
+      video.volume = 1;
+      video.muted = false;
+      await video.play();
     } catch {
       setIsPlaying(false);
     }
@@ -23,8 +31,8 @@ export default function ClinicVideo() {
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
             onEnded={() => setIsPlaying(false)}
-            controls
             playsInline
+            disablePictureInPicture
             preload="none"
             poster="/videos/w2-clinic-poster.jpg"
             width={720}
@@ -35,16 +43,16 @@ export default function ClinicVideo() {
             <source src="/videos/w2-clinic.mp4" type="video/mp4" />
             เบราว์เซอร์ของคุณไม่รองรับวิดีโอ <a href="/videos/w2-clinic.mp4">เปิดคลิปแนะนำคลินิก</a>
           </video>
-          {!isPlaying && (
             <button
               type="button"
               onClick={playVideo}
-              aria-label="เล่นวิดีโอแนะนำคลินิก"
-              className="absolute left-1/2 top-1/2 grid h-20 w-20 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-white/90 bg-black/45 text-white shadow-xl backdrop-blur-sm transition-colors hover:bg-w2-gold-dark focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-w2-gold"
+              aria-label={isPlaying ? "หยุดพักวิดีโอแนะนำคลินิก" : "เล่นวิดีโอแนะนำคลินิก"}
+              className="group absolute inset-0 grid w-full cursor-pointer place-items-center rounded-2xl focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-w2-gold"
             >
-              <Play size={36} fill="currentColor" className="ml-1" aria-hidden="true" />
+              <span className={`grid h-20 w-20 place-items-center rounded-full border-2 border-white/90 bg-black/45 text-white shadow-xl backdrop-blur-sm transition-opacity ${isPlaying ? "opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100" : "opacity-100"}`}>
+                {isPlaying ? <Pause size={36} fill="currentColor" aria-hidden="true" /> : <Play size={36} fill="currentColor" className="ml-1" aria-hidden="true" />}
+              </span>
             </button>
-          )}
       </div>
       <div className="px-3 pb-3 pt-4 text-center">
         <h2 id="clinic-video-heading" className="text-base font-bold text-w2-gray-900">ทำความรู้จัก W2 Dental Clinic</h2>
