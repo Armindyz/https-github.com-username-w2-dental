@@ -24,7 +24,7 @@ export default function ClinicVideo() {
   };
 
   return (
-    <section id="clinic-video" aria-labelledby="clinic-video-heading" className="mx-auto w-full max-w-[360px] scroll-mt-24 rounded-3xl border border-w2-gray-200 bg-white/95 p-2 shadow-xl shadow-w2-gray-700/10 backdrop-blur-sm">
+    <section id="clinic-video" aria-labelledby="clinic-video-heading" className="mx-auto w-full max-w-[400px] scroll-mt-24 rounded-3xl border border-w2-gray-200 bg-white/95 p-2 shadow-xl shadow-w2-gray-700/10 backdrop-blur-sm">
       <div className="relative">
           <video
             ref={videoRef}
@@ -34,7 +34,7 @@ export default function ClinicVideo() {
             playsInline
             disablePictureInPicture
             preload="none"
-            poster="/videos/w2-clinic-poster.jpg"
+            poster="/videos/w2-clinic-poster-09s.jpg"
             width={720}
             height={1280}
             aria-label="วิดีโอแนะนำ W2 Dental Clinic พร้อมคำบรรยายภาษาไทยในภาพ"
