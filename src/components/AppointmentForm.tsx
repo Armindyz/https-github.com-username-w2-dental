@@ -141,7 +141,7 @@ export default function AppointmentForm() {
                   เลือกแล้ว {selectedServices.length} บริการ
                 </span>
               </div>
-              <div className="grid auto-rows-fr grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
+              <div className="grid auto-rows-fr grid-cols-2 gap-2 sm:grid-cols-3">
                 {services.map((service, index) => {
                   const Icon = serviceIcons[index] ?? Ellipsis;
                   return (
@@ -155,14 +155,14 @@ export default function AppointmentForm() {
                           setSelectedServices((current) => checked ? [...current, service] : current.filter((item) => item !== service));
                         }}
                       />
-                      <span className="relative flex h-full min-h-32 flex-col items-center justify-center gap-3 rounded-2xl border border-w2-gray-200 bg-white px-3 py-5 text-center text-w2-gray-700 transition duration-200 hover:border-[#c9ac70] hover:bg-[#fffdf8] peer-checked:border-[#bd943c] peer-checked:bg-[#fff8e8] peer-checked:text-[#765313] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#bd943c] peer-checked:[&_.service-check]:border-[#bd943c] peer-checked:[&_.service-check]:bg-[#bd943c] peer-checked:[&_.service-check_svg]:opacity-100 peer-checked:[&_.service-icon]:bg-[#f7e9c7] peer-checked:[&_.service-icon]:text-[#9b7424]">
-                        <span className="service-check absolute right-3 top-3 flex h-4 w-4 items-center justify-center rounded-full border border-w2-gray-200 bg-white transition" aria-hidden="true">
+                      <span className="relative flex h-full min-h-[72px] items-center gap-2 rounded-xl border border-w2-gray-200 bg-white py-3 pl-2.5 pr-7 text-left text-w2-gray-700 sm:gap-2.5 sm:pl-3 transition duration-200 hover:border-[#c9ac70] hover:bg-[#fffdf8] peer-checked:border-[#bd943c] peer-checked:bg-[#fff8e8] peer-checked:text-[#765313] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#bd943c] peer-checked:[&_.service-check]:border-[#bd943c] peer-checked:[&_.service-check]:bg-[#bd943c] peer-checked:[&_.service-check_svg]:opacity-100 peer-checked:[&_.service-icon]:bg-[#f7e9c7] peer-checked:[&_.service-icon]:text-[#9b7424]">
+                        <span className="service-check absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full border border-w2-gray-200 bg-white transition" aria-hidden="true">
                           <Check size={10} strokeWidth={3} className="text-white opacity-0 transition" />
                         </span>
-                        <span className="service-icon flex h-10 w-10 items-center justify-center rounded-xl bg-w2-gray-50 text-w2-gray-500 transition" aria-hidden="true">
-                          <Icon size={23} strokeWidth={1.5} />
+                        <span className="service-icon flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-w2-gray-50 text-w2-gray-500 transition" aria-hidden="true">
+                          <Icon size={19} strokeWidth={1.5} />
                         </span>
-                        <span className="max-w-[15rem] text-[13px] font-medium leading-5 sm:text-sm">{service}</span>
+                        <span className="min-w-0 text-xs font-medium leading-5 sm:text-[13px]">{service}</span>
                       </span>
                     </label>
                   );
