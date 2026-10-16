@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { useInView } from "framer-motion";
-import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Check, CheckCircle, Loader2 } from "lucide-react";
 import { minimumAppointmentDate, services, sources } from "@/lib/appointment";
 
 type FormState = "idle" | "loading" | "success" | "error";
@@ -131,12 +131,17 @@ export default function AppointmentForm() {
             </div>
             <fieldset className="sm:col-span-2">
               <legend className="mb-2 text-sm font-bold text-w2-gray-700">ต้องการรับบริการด้านใด <span className="text-red-500">*</span></legend>
-              <p className="mb-3 text-xs text-w2-gray-500">เลือกได้มากกว่า 1 รายการ</p>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <p id="service-help" className="mb-4 text-xs leading-5 text-w2-gray-500">เลือกบริการที่สนใจได้มากกว่า 1 รายการ</p>
+              <div className="flex flex-wrap gap-2.5 rounded-2xl border border-w2-gray-100 bg-white/60 p-3 sm:p-4">
                 {services.map((service) => (
-                  <label key={service} className="flex cursor-pointer items-start gap-3 rounded-lg border border-w2-gray-100 bg-white px-4 py-3 text-sm text-w2-gray-700">
-                    <input type="checkbox" name="service" value={service} className="mt-0.5 h-4 w-4 shrink-0 accent-w2-gray-900" />
-                    <span>{service}</span>
+                  <label key={service} className="relative max-w-full cursor-pointer">
+                    <input type="checkbox" name="service" value={service} aria-describedby="service-help" className="peer sr-only" />
+                    <span className="flex min-h-11 items-center gap-2.5 rounded-2xl border border-w2-gray-200 bg-white px-3.5 py-2.5 text-sm leading-6 text-w2-gray-700 shadow-sm transition duration-150 hover:border-[#c99b39] hover:bg-[#fffdf7] peer-checked:border-[#bf902b] peer-checked:bg-[#fff5d9] peer-checked:text-[#765313] peer-checked:shadow-none peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#bf902b] peer-checked:[&_.service-check]:border-[#bf902b] peer-checked:[&_.service-check]:bg-[#bf902b] peer-checked:[&_.service-check_svg]:opacity-100">
+                      <span className="service-check flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-w2-gray-200 bg-w2-gray-50 transition" aria-hidden="true">
+                        <Check size={13} strokeWidth={3} className="text-white opacity-0 transition" />
+                      </span>
+                      <span>{service}</span>
+                    </span>
                   </label>
                 ))}
               </div>
