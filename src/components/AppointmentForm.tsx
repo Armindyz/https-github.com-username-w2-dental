@@ -4,22 +4,9 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { useInView } from "framer-motion";
 import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { minimumAppointmentDate, services, sources, timeSlots } from "@/lib/appointment";
 
 type FormState = "idle" | "loading" | "success" | "error";
-
-const services = [
-  "ทันตกรรมทั่วไป",
-  "ตรวจฟัน + ขูดหินปูน",
-  "จัดฟัน",
-  "ฟอกสีฟัน",
-  "รากฟันเทียม",
-  "วีเนียร์ / ครอบฟัน",
-  "ทำฟันปลอม",
-  "Smile Design",
-  "อื่น ๆ",
-];
-
-const googleScriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL ?? "";
 
 export default function AppointmentForm() {
   const ref = useRef(null);
@@ -29,7 +16,7 @@ export default function AppointmentForm() {
 
   const validate = (form: HTMLFormElement) => {
     const errs: Record<string, string> = {};
-    const required = ["fname", "lname", "phone", "service", "consent"];
+    const required = ["fname", "lname", "phone", "service", "appoint_date", "consent"];
     required.forEach((name) => {
       const el = form.elements.namedItem(name) as HTMLInputElement | null;
       if (!el) return;
@@ -38,11 +25,14 @@ export default function AppointmentForm() {
     });
     const phone = (form.elements.namedItem("phone") as HTMLInputElement)?.value;
     if (phone && !/^[0-9+\-\s()]{9,15}$/.test(phone)) errs.phone = "เบอร์โทรไม่ถูกต้อง";
+    const date = (form.elements.namedItem("appoint_date") as HTMLInputElement).value;
+    if (date && date < minimumAppointmentDate()) errs.appoint_date = "กรุณาเลือกวันที่ตั้งแต่วันเปิดให้บริการและไม่เป็นวันที่ผ่านมา";
     return errs;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (formState === "loading") return;
     const form = e.currentTarget;
     const errs = validate(form);
     if (Object.keys(errs).length) {
@@ -53,7 +43,6 @@ export default function AppointmentForm() {
     setFormState("loading");
 
     const data = {
-      timestamp: new Date().toLocaleString("th-TH"),
       fname: (form.elements.namedItem("fname") as HTMLInputElement).value.trim(),
       lname: (form.elements.namedItem("lname") as HTMLInputElement).value.trim(),
       phone: (form.elements.namedItem("phone") as HTMLInputElement).value.trim(),
@@ -61,24 +50,18 @@ export default function AppointmentForm() {
       service: (form.elements.namedItem("service") as HTMLSelectElement).value,
       source: (form.elements.namedItem("source") as HTMLSelectElement).value,
       note: (form.elements.namedItem("note") as HTMLTextAreaElement).value.trim(),
+      appoint_date: (form.elements.namedItem("appoint_date") as HTMLInputElement).value,
+      appoint_time: (form.elements.namedItem("appoint_time") as HTMLSelectElement).value,
+      consent: (form.elements.namedItem("consent") as HTMLInputElement).checked,
     };
 
     try {
-      if (googleScriptUrl) {
-        await fetch(googleScriptUrl, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(data),
-        });
-      } else {
-        const res = await fetch("/api/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-        if (!res.ok) throw new Error();
-      }
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok || (await res.json()).success !== true) throw new Error();
       setFormState("success");
       form.reset();
     } catch {
@@ -111,7 +94,7 @@ export default function AppointmentForm() {
             นัดหมาย<br />ออนไลน์
           </h2>
           <p className="mt-4 text-[15px] leading-[1.85] text-w2-gray-500 max-w-[260px]">
-            กรอกข้อมูลเบื้องต้น ทีมงานจะติดต่อกลับเพื่อยืนยันวันและเวลา โดยระบบส่งข้อมูลผ่าน API เดิมของโปรเจกต์
+            กรอกข้อมูลเบื้องต้นและเลือกวันที่สะดวก ทีมงานจะติดต่อกลับเพื่อยืนยันวันและเวลานัดหมาย
           </p>
         </div>
 
@@ -175,9 +158,24 @@ export default function AppointmentForm() {
               <label className="mb-2 block text-sm font-bold text-w2-gray-700">รู้จักเราจาก</label>
               <select name="source" className={inputClass("source")}>
                 <option value="">เลือกช่องทาง</option>
-                {["Facebook", "Instagram", "LINE", "Google", "เพื่อน / ครอบครัว", "อื่น ๆ"].map((source) => (
+                {sources.map((source) => (
                   <option key={source}>{source}</option>
                 ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="appoint_date" className="mb-2 block text-sm font-bold text-w2-gray-700">วันที่สะดวกเข้ารับบริการ <span className="text-red-500">*</span></label>
+              <input id="appoint_date" name="appoint_date" type="date" min={minimumAppointmentDate()} className={inputClass("appoint_date")} />
+              <p className="mt-1 text-xs text-w2-gray-500">เปิดให้บริการตั้งแต่ 23 พฤศจิกายน 2569</p>
+              {errors.appoint_date && <p className="mt-1 text-xs text-red-500">{errors.appoint_date}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="appoint_time" className="mb-2 block text-sm font-bold text-w2-gray-700">ช่วงเวลาที่สะดวก</label>
+              <select id="appoint_time" name="appoint_time" className={inputClass("appoint_time")}>
+                <option value="">เลือกช่วงเวลา</option>
+                {timeSlots.map((slot) => <option key={slot.value} value={slot.value}>{slot.label}</option>)}
               </select>
             </div>
 
@@ -195,7 +193,7 @@ export default function AppointmentForm() {
               <label className="flex cursor-pointer items-start gap-3">
                 <input type="checkbox" name="consent" className="mt-1 h-4 w-4 accent-w2-gray-900" />
                 <span className="text-sm leading-6 text-w2-gray-500">
-                  ข้าพเจ้ายินยอมให้ W2 Dental Clinic เก็บข้อมูลส่วนบุคคลเพื่อการนัดหมาย <span className="text-red-500">*</span>
+                  ข้าพเจ้ายินยอมให้ W2 Dental Clinic เก็บข้อมูลส่วนบุคคลเพื่อการนัดหมาย และติดต่อกลับเพื่อยืนยันนัดหมายและให้ข้อมูลบริการ <span className="text-red-500">*</span>
                 </span>
               </label>
               {errors.consent && <p className="ml-7 mt-1 text-xs text-red-500">{errors.consent}</p>}
@@ -221,7 +219,7 @@ export default function AppointmentForm() {
               <CheckCircle size={20} className="mt-0.5 shrink-0" />
               <div>
                 <p className="font-bold">ส่งคำขอนัดหมายสำเร็จ</p>
-                <p className="mt-1 text-sm text-w2-gray-500">ทีมงานจะติดต่อกลับเพื่อยืนยันภายใน 24 ชั่วโมง</p>
+                <p className="mt-1 text-sm text-w2-gray-500">ทีมงานจะติดต่อกลับทาง LINE หรือเบอร์โทรศัพท์เพื่อยืนยันนัดหมาย</p>
               </div>
             </div>
           )}
@@ -229,8 +227,8 @@ export default function AppointmentForm() {
             <div className="mt-4 flex items-start gap-3 rounded-lg border border-red-100 bg-red-50 p-4 text-red-700">
               <AlertCircle size={20} className="mt-0.5 shrink-0" />
               <div>
-                <p className="font-bold">ส่งข้อมูลไม่สำเร็จ</p>
-                <p className="mt-1 text-sm">กรุณาลองใหม่ หรือติดต่อทางโทรศัพท์/LINE</p>
+                <p className="font-bold">ยังยืนยันการส่งข้อมูลไม่ได้</p>
+                <p className="mt-1 text-sm">ข้อมูลที่กรอกยังอยู่ กรุณาตรวจสอบข้อมูล หรือติดต่อทางโทรศัพท์/LINE เพื่อตรวจสอบก่อนส่งซ้ำ</p>
               </div>
             </div>
           )}
