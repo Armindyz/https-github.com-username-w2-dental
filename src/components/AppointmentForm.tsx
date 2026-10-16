@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { useInView } from "framer-motion";
 import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
-import { minimumAppointmentDate, services, sources, timeSlots } from "@/lib/appointment";
+import { minimumAppointmentDate, services, sources } from "@/lib/appointment";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
@@ -16,13 +16,14 @@ export default function AppointmentForm() {
 
   const validate = (form: HTMLFormElement) => {
     const errs: Record<string, string> = {};
-    const required = ["fname", "lname", "phone", "service", "appoint_date", "consent"];
+    const required = ["full_name", "phone", "consent"];
     required.forEach((name) => {
       const el = form.elements.namedItem(name) as HTMLInputElement | null;
       if (!el) return;
       if (el.type === "checkbox" && !el.checked) errs[name] = "กรุณายืนยัน";
       else if (el.type !== "checkbox" && !el.value.trim()) errs[name] = "กรุณากรอก";
     });
+    if (!new FormData(form).getAll("service").length) errs.service = "กรุณาเลือกบริการอย่างน้อย 1 รายการ";
     const phone = (form.elements.namedItem("phone") as HTMLInputElement)?.value;
     if (phone && !/^[0-9+\-\s()]{9,15}$/.test(phone)) errs.phone = "เบอร์โทรไม่ถูกต้อง";
     const date = (form.elements.namedItem("appoint_date") as HTMLInputElement).value;
@@ -43,15 +44,11 @@ export default function AppointmentForm() {
     setFormState("loading");
 
     const data = {
-      fname: (form.elements.namedItem("fname") as HTMLInputElement).value.trim(),
-      lname: (form.elements.namedItem("lname") as HTMLInputElement).value.trim(),
+      full_name: (form.elements.namedItem("full_name") as HTMLInputElement).value.trim(),
       phone: (form.elements.namedItem("phone") as HTMLInputElement).value.trim(),
-      line_id: (form.elements.namedItem("line_id") as HTMLInputElement).value.trim(),
-      service: (form.elements.namedItem("service") as HTMLSelectElement).value,
+      services: new FormData(form).getAll("service"),
       source: (form.elements.namedItem("source") as HTMLSelectElement).value,
-      note: (form.elements.namedItem("note") as HTMLTextAreaElement).value.trim(),
       appoint_date: (form.elements.namedItem("appoint_date") as HTMLInputElement).value,
-      appoint_time: (form.elements.namedItem("appoint_time") as HTMLSelectElement).value,
       consent: (form.elements.namedItem("consent") as HTMLInputElement).checked,
     };
 
@@ -94,7 +91,7 @@ export default function AppointmentForm() {
             นัดหมาย<br />ออนไลน์
           </h2>
           <p className="mt-4 text-[15px] leading-[1.85] text-w2-gray-500 max-w-[260px]">
-            กรอกข้อมูลเบื้องต้นและเลือกวันที่สะดวก ทีมงานจะติดต่อกลับเพื่อยืนยันวันและเวลานัดหมาย
+            กรอกข้อมูลเบื้องต้นและเลือกบริการที่สนใจ ทีมงานจะติดต่อกลับเพื่อยืนยันวันและเวลานัดหมาย
           </p>
         </div>
 
@@ -123,77 +120,47 @@ export default function AppointmentForm() {
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-bold text-w2-gray-700">ชื่อ <span className="text-red-500">*</span></label>
-              <input name="fname" type="text" placeholder="ชื่อจริง" className={inputClass("fname")} />
-              {errors.fname && <p className="mt-1 text-xs text-red-500">{errors.fname}</p>}
+              <label htmlFor="full_name" className="mb-2 block text-sm font-bold text-w2-gray-700">ชื่อ-นามสกุล <span className="text-red-500">*</span></label>
+              <input id="full_name" name="full_name" type="text" autoComplete="name" placeholder="ชื่อ-นามสกุล" className={inputClass("full_name")} />
+              {errors.full_name && <p className="mt-1 text-xs text-red-500">{errors.full_name}</p>}
             </div>
-
             <div>
-              <label className="mb-2 block text-sm font-bold text-w2-gray-700">นามสกุล <span className="text-red-500">*</span></label>
-              <input name="lname" type="text" placeholder="นามสกุล" className={inputClass("lname")} />
-              {errors.lname && <p className="mt-1 text-xs text-red-500">{errors.lname}</p>}
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-bold text-w2-gray-700">เบอร์โทร <span className="text-red-500">*</span></label>
-              <input name="phone" type="tel" placeholder="0XX-XXX-XXXX" className={inputClass("phone")} />
+              <label htmlFor="phone" className="mb-2 block text-sm font-bold text-w2-gray-700">เบอร์โทรศัพท์ <span className="text-red-500">*</span></label>
+              <input id="phone" name="phone" type="tel" autoComplete="tel" placeholder="0XX-XXX-XXXX" className={inputClass("phone")} />
               {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
             </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-bold text-w2-gray-700">LINE ID</label>
-              <input name="line_id" type="text" placeholder="LINE ID ของคุณ" className={inputClass("line_id")} />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-bold text-w2-gray-700">บริการที่ต้องการ <span className="text-red-500">*</span></label>
-              <select name="service" className={inputClass("service")}>
-                <option value="">เลือกบริการ</option>
-                {services.map((service) => <option key={service}>{service}</option>)}
-              </select>
-              {errors.service && <p className="mt-1 text-xs text-red-500">{errors.service}</p>}
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-bold text-w2-gray-700">รู้จักเราจาก</label>
-              <select name="source" className={inputClass("source")}>
-                <option value="">เลือกช่องทาง</option>
-                {sources.map((source) => (
-                  <option key={source}>{source}</option>
+            <fieldset className="sm:col-span-2">
+              <legend className="mb-2 text-sm font-bold text-w2-gray-700">ต้องการรับบริการด้านใด <span className="text-red-500">*</span></legend>
+              <p className="mb-3 text-xs text-w2-gray-500">เลือกได้มากกว่า 1 รายการ</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {services.map((service) => (
+                  <label key={service} className="flex cursor-pointer items-start gap-3 rounded-lg border border-w2-gray-100 bg-white px-4 py-3 text-sm text-w2-gray-700">
+                    <input type="checkbox" name="service" value={service} className="mt-0.5 h-4 w-4 shrink-0 accent-w2-gray-900" />
+                    <span>{service}</span>
+                  </label>
                 ))}
-              </select>
-            </div>
-
+              </div>
+              {errors.service && <p className="mt-1 text-xs text-red-500">{errors.service}</p>}
+            </fieldset>
             <div>
-              <label htmlFor="appoint_date" className="mb-2 block text-sm font-bold text-w2-gray-700">วันที่สะดวกเข้ารับบริการ <span className="text-red-500">*</span></label>
+              <label htmlFor="appoint_date" className="mb-2 block text-sm font-bold text-w2-gray-700">วันที่สะดวกเข้ารับบริการ</label>
               <input id="appoint_date" name="appoint_date" type="date" min={minimumAppointmentDate()} className={inputClass("appoint_date")} />
-              <p className="mt-1 text-xs text-w2-gray-500">เปิดให้บริการตั้งแต่ 23 พฤศจิกายน 2569</p>
+              <p className="mt-1 text-xs text-w2-gray-500">ไม่บังคับกรอก · เปิดให้บริการตั้งแต่ 23 พฤศจิกายน 2569 เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันวันและเวลาอีกครั้ง</p>
               {errors.appoint_date && <p className="mt-1 text-xs text-red-500">{errors.appoint_date}</p>}
             </div>
-
             <div>
-              <label htmlFor="appoint_time" className="mb-2 block text-sm font-bold text-w2-gray-700">ช่วงเวลาที่สะดวก</label>
-              <select id="appoint_time" name="appoint_time" className={inputClass("appoint_time")}>
-                <option value="">เลือกช่วงเวลา</option>
-                {timeSlots.map((slot) => <option key={slot.value} value={slot.value}>{slot.label}</option>)}
+              <label htmlFor="source" className="mb-2 block text-sm font-bold text-w2-gray-700">ช่องทางที่ทราบข่าวสารของคลินิก</label>
+              <select id="source" name="source" className={inputClass("source")}>
+                <option value="">เลือกช่องทาง</option>
+                {sources.map((source) => <option key={source}>{source}</option>)}
               </select>
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="mb-2 block text-sm font-bold text-w2-gray-700">รายละเอียดเพิ่มเติม</label>
-              <textarea
-                name="note"
-                rows={4}
-                placeholder="ระบุอาการหรือช่วงเวลาที่สะดวกให้ติดต่อกลับ"
-                className={`${inputClass("note")} resize-none`}
-              />
             </div>
 
             <div className="sm:col-span-2">
               <label className="flex cursor-pointer items-start gap-3">
                 <input type="checkbox" name="consent" className="mt-1 h-4 w-4 accent-w2-gray-900" />
                 <span className="text-sm leading-6 text-w2-gray-500">
-                  ข้าพเจ้ายินยอมให้ W2 Dental Clinic เก็บข้อมูลส่วนบุคคลเพื่อการนัดหมาย และติดต่อกลับเพื่อยืนยันนัดหมายและให้ข้อมูลบริการ <span className="text-red-500">*</span>
+                  ยินยอมให้ W2 Dental Clinic ติดต่อกลับเพื่อยืนยันนัดหมายและให้ข้อมูลบริการ <span className="text-red-500">*</span>
                 </span>
               </label>
               {errors.consent && <p className="ml-7 mt-1 text-xs text-red-500">{errors.consent}</p>}
@@ -219,7 +186,7 @@ export default function AppointmentForm() {
               <CheckCircle size={20} className="mt-0.5 shrink-0" />
               <div>
                 <p className="font-bold">ส่งคำขอนัดหมายสำเร็จ</p>
-                <p className="mt-1 text-sm text-w2-gray-500">ทีมงานจะติดต่อกลับทาง LINE หรือเบอร์โทรศัพท์เพื่อยืนยันนัดหมาย</p>
+                <p className="mt-1 text-sm text-w2-gray-500">ทีมงานจะติดต่อกลับทางเบอร์โทรศัพท์เพื่อยืนยันนัดหมาย</p>
               </div>
             </div>
           )}

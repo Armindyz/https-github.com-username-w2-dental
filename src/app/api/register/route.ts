@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { minimumAppointmentDate, services, sources, timeSlots } from "@/lib/appointment";
+import { minimumAppointmentDate, services, sources } from "@/lib/appointment";
 
 const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSccn4MKy056e5VgzD44uBvitoGyPzfbXC_1EhAlZxZPFVbESg/formResponse";
 
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
-  const fields = ["fname", "lname", "phone", "line_id", "service", "source", "note", "appoint_date", "appoint_time"] as const;
+  const fields = ["full_name", "fname", "lname", "phone", "service", "source", "appoint_date"] as const;
   const data: Record<string, string> = {};
   for (const field of fields) {
     const value = body[field];
@@ -21,30 +21,34 @@ export async function POST(request: NextRequest) {
     }
     data[field] = typeof value === "string" ? value.trim() : "";
   }
+  // Accept the previous website payload while already-open tabs update.
+  const fullName = data.full_name || [data.fname, data.lname].filter(Boolean).join(" ");
+  const selectedServices = body.services ?? (data.service ? [data.service] : []);
+  const validServices = Array.isArray(selectedServices) && selectedServices.length > 0
+    && selectedServices.length <= services.length
+    && selectedServices.every((service) => typeof service === "string" && services.includes(service));
   const date = data.appoint_date;
   const parsedDate = new Date(`${date}T00:00:00Z`);
-  if (!data.fname || !data.lname || !/^[0-9+\-\s()]{9,15}$/.test(data.phone)
-    || !services.includes(data.service) || body.consent !== true
+  if (!fullName || !/^[0-9+\-\s()]{9,15}$/.test(data.phone)
+    || !validServices || body.consent !== true
     || (data.source && !sources.includes(data.source))
-    || (data.appoint_time && !timeSlots.some((slot) => slot.value === data.appoint_time))
-    || !/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(parsedDate.getTime())
-    || parsedDate.toISOString().slice(0, 10) !== date || date < minimumAppointmentDate()) {
+    || (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(parsedDate.getTime())
+      || parsedDate.toISOString().slice(0, 10) !== date || date < minimumAppointmentDate()))) {
     return NextResponse.json({ error: "กรุณาตรวจสอบข้อมูลและวันที่นัดหมายให้ถูกต้อง" }, { status: 400 });
   }
-  const [year, month, day] = date.split("-");
   const payload = new URLSearchParams({
-    "entry.496790890": `${data.fname} ${data.lname}`,
+    "entry.496790890": fullName,
     "entry.765612988": data.phone,
-    "entry.1940050088": data.line_id,
-    "entry.899800354": data.service,
-    "entry.1107564578": data.note,
-    "entry.1931408668_year": year,
-    "entry.1931408668_month": month,
-    "entry.1931408668_day": day,
-    "entry.1955981945": data.appoint_time,
-    "entry.1640438865": data.source,
     "entry.622878355": "ยินยอม",
   });
+  for (const service of selectedServices as string[]) payload.append("entry.899800354", service);
+  if (data.source) payload.set("entry.1640438865", data.source);
+  if (date) {
+    const [year, month, day] = date.split("-");
+    payload.set("entry.1931408668_year", year);
+    payload.set("entry.1931408668_month", month);
+    payload.set("entry.1931408668_day", day);
+  }
   try {
     const response = await fetch(FORM_URL, {
       method: "POST", body: payload,
