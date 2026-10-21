@@ -3,10 +3,8 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { useInView } from "framer-motion";
-import { Activity, AlertCircle, Anchor, Check, CheckCircle, CirclePlus, Ellipsis, Gem, HeartPulse, Loader2, Scissors, ShieldCheck, Smile, Sparkles, Stethoscope } from "lucide-react";
+import { AlertCircle, CheckCircle, ChevronDown, Loader2 } from "lucide-react";
 import { minimumAppointmentDate, services, sources } from "@/lib/appointment";
-
-const serviceIcons = [ShieldCheck, CirclePlus, Scissors, Activity, Smile, Sparkles, Anchor, Gem, HeartPulse, Stethoscope, Ellipsis];
 
 type FormState = "idle" | "loading" | "success" | "error";
 
@@ -71,10 +69,10 @@ export default function AppointmentForm() {
   };
 
   const inputClass = (name: string) =>
-    `w-full rounded-lg border bg-white px-4 py-3 text-sm outline-none transition ${
+    `w-full min-h-12 rounded-xl border bg-white px-4 py-3 text-sm text-w2-gray-700 shadow-sm outline-none transition duration-200 ${
       errors[name]
         ? "border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-50"
-        : "border-w2-gray-100 focus:border-w2-gray-400 focus:ring-4 focus:ring-w2-gray-50"
+        : "border-w2-gray-200 hover:border-[#cbb98e] focus:border-[#bd943c] focus:ring-4 focus:ring-[#bd943c]/10"
     }`;
 
   return (
@@ -102,14 +100,14 @@ export default function AppointmentForm() {
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="silver-card rounded-lg p-6 sm:p-8 lg:col-start-2"
+          className="silver-card rounded-2xl p-6 sm:p-8 lg:col-start-2"
           style={{
             opacity: inView ? 1 : 0,
             transform: inView ? "translateX(0)" : "translateX(24px)",
             transition: "opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s",
           }}
         >
-          <div className="mb-6 flex items-center gap-4 rounded-lg bg-w2-off p-4">
+          <div className="mb-7 flex items-center gap-4 rounded-xl border border-[#e7dfce] bg-linear-to-br from-white to-[#f5f1e8] p-4">
             <Image
               src="/brand/w2-logo-icon.png"
               alt="W2 Dental Clinic logo icon"
@@ -122,7 +120,7 @@ export default function AppointmentForm() {
               <p className="text-sm text-w2-gray-500">แบบฟอร์มนัดหมายออนไลน์</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
             <div>
               <label htmlFor="full_name" className="mb-2 block text-sm font-bold text-w2-gray-700">ชื่อ-นามสกุล <span className="text-red-500">*</span></label>
               <input id="full_name" name="full_name" type="text" autoComplete="name" placeholder="ชื่อ-นามสกุล" className={inputClass("full_name")} />
@@ -135,40 +133,42 @@ export default function AppointmentForm() {
             </div>
             <fieldset className="sm:col-span-2">
               <legend className="mb-2 text-sm font-bold text-w2-gray-700">ต้องการรับบริการด้านใด <span className="text-red-500">*</span></legend>
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                <p id="service-help" className="text-xs leading-5 text-w2-gray-500">เลือกบริการที่สนใจได้มากกว่า 1 รายการ</p>
-                <span role="status" aria-live="polite" className="inline-flex items-center gap-1.5 rounded-full border border-[#e8d8b2] bg-[#fff8e8] px-3 py-1 text-xs font-medium text-[#876722]">
-                  <CheckCircle size={13} aria-hidden="true" />
-                  เลือกแล้ว {selectedServices.length} บริการ
-                </span>
-              </div>
-              <div className="grid auto-rows-fr grid-cols-2 gap-1.5 sm:grid-cols-3">
-                {services.map((service, index) => {
-                  const Icon = serviceIcons[index] ?? Ellipsis;
-                  return (
-                    <label key={service} className="relative min-w-0 cursor-pointer">
-                      <input
-                        type="checkbox" name="service" value={service}
-                        aria-describedby="service-help" className="peer sr-only"
-                        checked={selectedServices.includes(service)}
-                        onChange={(event) => {
-                          const checked = event.target.checked;
-                          setSelectedServices((current) => checked ? [...current, service] : current.filter((item) => item !== service));
-                        }}
-                      />
-                      <span className="relative flex h-full min-h-[60px] items-center gap-2 rounded-xl border border-[#e4e5e8] bg-linear-to-br from-white to-[#f7f8fa] py-2 pl-2.5 pr-7 text-left text-w2-gray-700 sm:gap-2.5 sm:pl-3 shadow-[0_1px_2px_rgba(30,41,59,0.03)] transition duration-200 motion-safe:hover:-translate-y-0.5 hover:border-[#c9ac70] hover:shadow-[0_4px_12px_rgba(148,115,45,0.10)] peer-checked:border-[#bd943c] peer-checked:from-[#fffaf0] peer-checked:to-[#f9edce] peer-checked:shadow-[0_2px_8px_rgba(148,115,45,0.12)] peer-checked:text-[#765313] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#bd943c] peer-checked:[&_.service-check]:border-[#bd943c] peer-checked:[&_.service-check]:bg-[#bd943c] peer-checked:[&_.service-check_svg]:opacity-100 peer-checked:[&_.service-icon]:bg-[#f7e9c7] peer-checked:[&_.service-icon]:text-[#9b7424]">
-                        <span className="service-check absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full border border-w2-gray-200 bg-white transition" aria-hidden="true">
-                          <Check size={10} strokeWidth={3} className="text-white opacity-0 transition" />
-                        </span>
-                        <span className="service-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#ecdfc3] bg-linear-to-br from-[#fffaf0] to-[#f1e5c9] text-[#9b772d] transition" aria-hidden="true">
-                          <Icon size={17} strokeWidth={1.5} />
-                        </span>
-                        <span className="min-w-0 text-xs font-medium leading-5 sm:text-[13px]">{service}</span>
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
+              <p id="service-help" className="mb-2 text-xs leading-5 text-w2-gray-500">เลือกได้มากกว่า 1 บริการ</p>
+              <details className={`group overflow-hidden rounded-xl border bg-white shadow-sm transition duration-200 hover:border-[#cbb98e] open:border-[#bd943c] open:shadow-[0_8px_24px_rgba(148,115,45,0.08)] ${errors.service ? "border-red-300" : "border-w2-gray-200"}`}>
+                <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm text-w2-gray-700 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#bd943c] [&::-webkit-details-marker]:hidden">
+                  <span className="flex min-w-0 flex-wrap gap-1.5 leading-6">
+                    {selectedServices.length ? selectedServices.map((service) => (
+                      <span key={service} className="rounded-md border border-[#eadcbb] bg-[#faf5e9] px-2 py-0.5 text-xs font-medium text-[#806124]">{service}</span>
+                    )) : "เลือกบริการ"}
+                  </span>
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f7f3e9] text-[#94732d]" aria-hidden="true"><ChevronDown size={16} className="transition-transform group-open:rotate-180" /></span>
+                </summary>
+                <div className="border-t border-w2-gray-100">
+                  <div className="max-h-64 space-y-1 overflow-y-auto p-2">
+                    {services.map((service) => (
+                      <label key={service} className="flex cursor-pointer items-start gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm leading-6 text-w2-gray-700 transition-colors hover:bg-[#f7f8fa] has-checked:border-[#eadcbb] has-checked:bg-[#faf5e9] has-checked:text-[#765313] has-focus-visible:ring-2 has-focus-visible:ring-[#bd943c]">
+                        <input
+                          type="checkbox" name="service" value={service}
+                          aria-describedby="service-help" className="mt-1 h-4 w-4 shrink-0 accent-[#bd943c]"
+                          checked={selectedServices.includes(service)}
+                          onChange={(event) => {
+                            const checked = event.target.checked;
+                            setSelectedServices((current) => checked ? [...current, service] : current.filter((item) => item !== service));
+                          }}
+                        />
+                        <span>{service}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between gap-3 border-t border-w2-gray-100 bg-[#fafbfc] px-4 py-3">
+                    <span role="status" aria-live="polite" className="text-xs text-w2-gray-500">เลือกแล้ว {selectedServices.length} บริการ</span>
+                    <button type="button" className="rounded-lg border border-[#dfc992] bg-[#f7edcf] px-4 py-1.5 text-sm font-medium text-[#765313] transition hover:bg-[#efdfb3] focus-visible:outline-2 focus-visible:outline-[#bd943c]" onClick={(event) => {
+                      const details = event.currentTarget.closest("details");
+                      if (details) { details.open = false; details.querySelector("summary")?.focus(); }
+                    }}>เสร็จสิ้น</button>
+                  </div>
+                </div>
+              </details>
               {errors.service && <p className="mt-1 text-xs text-red-500">{errors.service}</p>}
             </fieldset>
             <div>
